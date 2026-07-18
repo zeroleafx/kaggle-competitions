@@ -5,6 +5,7 @@ import pandas as pd
 import sklearn
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
+from torchmetrics import Accuracy
 
 train = pd.read_csv("titanic/train.csv")
 test = pd.read_csv("titanic/test.csv")
@@ -47,12 +48,15 @@ X_test = X_test.to(device)
 loss_fn = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.SGD(params=model_0.parameters(),lr=0.1)
 
+accuracy_fn = Accuracy(task="binary").to(device)
+
 epochs = 500
 for epoch in range(epochs):
     model_0.train()
     y_logits = model_0(X_train)
     y_preds = torch.sigmoid(y_logits)
     loss = loss_fn(y_logits, y_train)
+    acc = accuracy_fn(y_preds, y_train)
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -61,6 +65,9 @@ for epoch in range(epochs):
     with torch.inference_mode():
         test_logits = model_0(X_test)
         test_preds = torch.round(torch.sigmoid(test_logits))
+
+    if epoch % 50 == 0:
+        print(f"Epoch: {epoch} | Loss: {loss:.5f} Accuracy: {acc:.5f}")
 
     submission = pd.DataFrame({
         'PassengerId': test['PassengerId'],
