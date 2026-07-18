@@ -67,7 +67,7 @@ for epoch in range(epochs):
         test_preds = torch.round(torch.sigmoid(test_logits))
 
     if epoch % 50 == 0:
-        print(f"Epoch: {epoch} | Loss: {loss:.5f} Accuracy: {acc:.5f}")
+        print(f"Epoch: {epoch} | Loss: {loss:.5f} | Accuracy: {acc:.5f}")
 
     submission = pd.DataFrame({
         'PassengerId': test['PassengerId'],
